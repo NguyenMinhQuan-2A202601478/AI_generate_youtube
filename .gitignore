@@ -1,0 +1,14 @@
+# Harness core maintenance binary
+scripts/bin/harness
+scripts/bin/harness.exe
+
+# Secrets - never commit
+.env
+
+# Generated data & local artifacts
+output/
+chroma_db/
+__pycache__/
+.harness-backup/
+*.mp4
+*.webm
