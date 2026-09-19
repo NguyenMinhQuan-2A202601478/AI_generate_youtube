@@ -22,6 +22,10 @@ the working product the video teaches, verified — not just a summary of it.
   working directory (never hardcode or commit keys; `.env` must be gitignored).
 - Python packages: `google-genai`, `yt-dlp`, `youtube-transcript-api`,
   `python-dotenv`. Install any that are missing before Phase 1.
+  On macOS with Homebrew Python, plain `pip3 install` fails with
+  `externally-managed-environment` (PEP 668) — create and use a venv instead
+  (`python3 -m venv ~/.venvs/ai-generate-youtube && source ~/.venvs/ai-generate-youtube/bin/activate`),
+  and launch Claude Code from the activated venv so the script picks it up.
 - `ffmpeg` on PATH is optional (enables audio+video merge and the
   frame-extraction fallback; the script works without it).
 - Whatever the *build* itself needs (other API keys, packages) is discovered

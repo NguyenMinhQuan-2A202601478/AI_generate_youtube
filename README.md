@@ -54,12 +54,22 @@ Thư mục sinh ra khi chạy (không commit): `chroma_db/` (vector DB), `output
 git clone https://github.com/NguyenMinhQuan-2A202601478/AI_generate_youtube.git
 cd AI_generate_youtube
 
+# Khuyến nghị: dùng virtual environment (BẮT BUỘC trên macOS với Python
+# cài qua Homebrew — pip hệ thống bị chặn theo PEP 668 "externally-managed-environment")
+python3 -m venv .venv
+source .venv/bin/activate        # macOS/Linux
+# .venv\Scripts\Activate.ps1     # Windows PowerShell
+
 # Dependencies cho skill video-to-action
 pip install -r requirements.txt
 
 # Dependencies cho sản phẩm HR Agent
 pip install -r setup.txt
 ```
+
+> **Lưu ý macOS**: nếu gặp lỗi `error: externally-managed-environment`, đó là cơ chế
+> PEP 668 của Python Homebrew — luôn cài trong venv như trên. Khi dùng với Claude Code,
+> kích hoạt venv trước rồi mới mở Claude trong cùng terminal: `source .venv/bin/activate && claude`
 
 ### Cấu hình API key
 

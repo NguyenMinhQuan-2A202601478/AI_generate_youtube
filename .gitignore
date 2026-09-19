@@ -6,6 +6,7 @@ scripts/bin/harness.exe
 .env
 
 # Generated data & local artifacts
+.venv/
 output/
 chroma_db/
 __pycache__/
