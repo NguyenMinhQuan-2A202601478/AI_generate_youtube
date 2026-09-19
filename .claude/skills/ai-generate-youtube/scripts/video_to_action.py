@@ -113,9 +113,13 @@ def fetch_transcript(video_id: str) -> str:
         snippets = list(transcript.fetch())
     lines = []
     for s in snippets:
-        start = getattr(s, "start", None) or s.get("start", 0)
-        text = getattr(s, "text", None) or s.get("text", "")
-        mins, secs = divmod(int(start), 60)
+        # Snippets are objects in current youtube-transcript-api, dicts in old
+        # versions. A start of 0.0 is falsy, so probe by type, not truthiness.
+        if isinstance(s, dict):
+            start, text = s.get("start", 0), s.get("text", "")
+        else:
+            start, text = getattr(s, "start", 0), getattr(s, "text", "")
+        mins, secs = divmod(int(start or 0), 60)
         lines.append(f"[{mins:02d}:{secs:02d}] {text}")
     return "\n".join(lines)
 
