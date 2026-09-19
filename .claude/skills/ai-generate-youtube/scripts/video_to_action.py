@@ -50,6 +50,21 @@ def get_client():
 
 MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.6-flash")
 
+
+def generate_with_retry(client, *, attempts=3, wait_s=30, **kwargs):
+    """generate_content with retries: Gemini returns 503 during demand spikes,
+    and those usually clear within a minute — don't fail the whole run for one."""
+    from google.genai import errors as genai_errors
+
+    for i in range(attempts):
+        try:
+            return client.models.generate_content(**kwargs)
+        except genai_errors.ServerError as e:
+            if i == attempts - 1:
+                raise
+            print(f"[retry] Gemini server error; retrying in {wait_s}s ({i + 1}/{attempts - 1})...")
+            time.sleep(wait_s)
+
 # ---------------------------------------------------------------- youtube utils
 
 def video_id_from_url(url: str) -> str:
@@ -198,7 +213,8 @@ def analyze_full(client, url: str, question: str | None, workdir: Path) -> str:
     if uploaded.state and uploaded.state.name == "FAILED":
         raise RuntimeError("Gemini File API failed to process the video")
     print("[full] Gemini is watching the video...")
-    resp = client.models.generate_content(
+    resp = generate_with_retry(
+        client,
         model=MODEL,
         contents=[uploaded, build_prompt(question) + transcript_note],
     )
@@ -214,7 +230,7 @@ def analyze_quick(client, video_id: str, question: str | None) -> str:
         + "\n\nYou only have the TRANSCRIPT (no visuals). Note visual details you "
         "cannot verify.\n\nTRANSCRIPT:\n" + transcript
     )
-    resp = client.models.generate_content(model=MODEL, contents=prompt)
+    resp = generate_with_retry(client, model=MODEL, contents=prompt)
     return resp.text
 
 
@@ -236,7 +252,7 @@ def analyze_fallback(client, url: str, video_id: str, question: str | None, work
         + "\n\nThe images are frames sampled every 30 seconds, in order.\n\nTRANSCRIPT:\n"
         + transcript
     )
-    resp = client.models.generate_content(model=MODEL, contents=parts)
+    resp = generate_with_retry(client, model=MODEL, contents=parts)
     return resp.text
 
 # ---------------------------------------------------------------- main

@@ -19,9 +19,10 @@ Dự án gồm **2 phần**:
 AI_generate_youtube/
 ├── .claude/
 │   └── skills/
-│       └── video-to-action/
-│           ├── SKILL.md            # Mô tả skill cho Claude
-│           └── video_to_action.py  # YouTube → Gemini → các bước hành động
+│       └── ai-generate-youtube/
+│           ├── SKILL.md                    # Skill trọn vòng đời: xem → kế hoạch → build → verify
+│           └── scripts/
+│               └── video_to_action.py      # YouTube → Gemini → các bước hành động
 ├── .agents/                        # Skills của repository-harness
 ├── docs/                           # Workflow, templates, decisions (harness)
 ├── image/
@@ -82,18 +83,24 @@ OPENAI_API_KEY=your_openai_key_here
 
 ## 🚀 Cách chạy
 
-### 1. Skill video-to-action (AI học từ video)
+### 1. Skill ai-generate-youtube (AI học từ video rồi build theo)
+
+Trong Claude Code chỉ cần dán link YouTube và nói "làm theo video này" (hoặc gõ `/ai-generate-youtube <link>`). Chạy script trích xuất thủ công:
 
 ```bash
 # Phân tích đầy đủ (Gemini xem cả hình và tiếng)
-python .claude/skills/video-to-action/video_to_action.py "https://youtu.be/VIDEO_ID"
+python .claude/skills/ai-generate-youtube/scripts/video_to_action.py "https://youtu.be/VIDEO_ID"
 
 # Chế độ nhanh (chỉ transcript, rẻ hơn)
-python .claude/skills/video-to-action/video_to_action.py "https://youtu.be/VIDEO_ID" --quick
+python .claude/skills/ai-generate-youtube/scripts/video_to_action.py "https://youtu.be/VIDEO_ID" --quick
 
 # Hỏi một câu cụ thể về video
-python .claude/skills/video-to-action/video_to_action.py "https://youtu.be/VIDEO_ID" --question "Bước 3 tác giả cấu hình gì?"
+python .claude/skills/ai-generate-youtube/scripts/video_to_action.py "https://youtu.be/VIDEO_ID" --question "Bước 3 tác giả cấu hình gì?"
 ```
+
+> **Giới hạn môi trường**: skill cần chạy trên máy thật (Claude Code). Sandbox cloud của
+> claude.ai chặn cả youtube.com lẫn Gemini API nên không dùng được ở đó. YouTube đôi khi
+> chặn lấy transcript theo IP — chế độ full vẫn hoạt động vì Gemini xem trực tiếp video.
 
 Kết quả lưu tại `output/<video_id>_steps.md`.
 

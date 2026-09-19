@@ -32,6 +32,20 @@ the working product the video teaches, verified — not just a summary of it.
   from the extracted plan in Phase 2 — confirm those with the user, don't
   assume.
 
+## Environment limits (verified in practice)
+
+- This skill needs a real machine with open network access (Claude Code on
+  desktop). The claude.ai cloud sandbox blocks both youtube.com and the Gemini
+  API at the infrastructure level (403 policy denial) — if you see that, stop
+  and tell the user to run the skill on a local machine; do not try to bypass
+  network policy.
+- YouTube sometimes blocks transcript fetching per-IP. That is fine: full mode
+  still works because Gemini watches the video itself. Only quick mode
+  (`--quick`) depends on the transcript.
+- Gemini occasionally returns 503 "high demand" — the script now retries
+  automatically (3 attempts, 30s apart). If it still fails, wait a minute and
+  rerun rather than switching approach.
+
 ## Phase 1 — Watch & extract
 
 Run the bundled script (from the skill directory, `scripts/video_to_action.py`):
