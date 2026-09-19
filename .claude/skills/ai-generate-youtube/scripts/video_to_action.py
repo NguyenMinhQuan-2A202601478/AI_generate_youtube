@@ -62,13 +62,15 @@ def video_id_from_url(url: str) -> str:
 def download_video(url: str, workdir: Path) -> Path:
     """Download the video at low resolution (<=480p, small file for upload)."""
     out_tmpl = str(workdir / "video.%(ext)s")
-    # Try progressively looser format selectors: some formats need a JS runtime
-    # or ffmpeg (for merging), so fall back to any single pre-merged stream.
-    selectors = [
-        "b[height<=480]",       # pre-merged, low-res
-        "bv*[height<=480]+ba/b",  # merged low-res (needs ffmpeg)
-        "b",                    # any best pre-merged
-    ]
+    # Try progressively looser format selectors. Merging video+audio needs
+    # ffmpeg; without it, end with a VIDEO-ONLY stream — never separate files,
+    # which risk uploading the audio track to Gemini by mistake (narration is
+    # covered by the transcript instead).
+    import shutil as _shutil
+    if _shutil.which("ffmpeg"):
+        selectors = ["b[height<=480]", "bv*[height<=480]+ba/bv*+ba", "b"]
+    else:
+        selectors = ["b[height<=480]", "b", "bv*[height<=480]", "bv*"]
     print(f"[full] downloading video (low-res): {url}")
     last_err = None
     for sel in selectors:
